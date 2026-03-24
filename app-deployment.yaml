@@ -4,6 +4,11 @@ metadata:
   name: fitness-tracker-app
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
   selector:
     matchLabels:
       app: fitness-tracker-app
@@ -17,36 +22,29 @@ spec:
            {"source":"nodejs","service":"fitness-tracker-app"}]
     spec:
       containers:
-        - name: fitness-tracker-app
-          image: pulkit197/fitness_tracker-master-copy3-fitness-app:latest
-          ports:
-            - containerPort: 5000
-          # ✔ All configMap vars removed
-          # ✔ Direct env variables added
-          env:
-            - name: MONGODB_URI
-              value: "mongodb://mongodb-service:27017/fitness-tracker"
-            - name: PORT
-              value: "5000"
-            - name: HOST
-              value: "0.0.0.0"
-            - name: NODE_ENV
-              value: "production"
-            # Datadog APM (tracing) env variables
-            - name: DD_AGENT_HOST
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-            - name: DD_TRACE_AGENT_PORT
-              value: "8126"
-            - name: DD_ENV
-              value: "production"
-            - name: DD_SERVICE
-              value: "fitness-tracker-app"
-            - name: DD_VERSION
-              value: "1.0.0"
+      - name: fitness-tracker-app
+        image: pulkit197/fitness_tracker-master-copy3-fitness-app:latest
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+        envFrom:
+        - configMapRef:
+            name: fitness-configmap
+        env:
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+      volumes:
+      - name: likhitha-data
+        emptyDir: {}
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
