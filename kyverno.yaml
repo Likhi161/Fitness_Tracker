@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-rolling-update
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-rolling-update
+      match:
+        resources:
+          kinds:
+            - Deployment
+      validate:
+        message: "Deployment must use RollingUpdate strategy"
+        pattern:
+          spec:
+            strategy:
+              type: RollingUpdate
