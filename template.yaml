@@ -57,30 +57,3 @@ spec:
           container.imagePullPolicy != "IfNotPresent"
           msg := sprintf("Container %v must have imagePullPolicy set to IfNotPresent", [container.name])
         }
----
-apiVersion: templates.gatekeeper.sh/v1beta1
-kind: ConstraintTemplate
-metadata:
-  name: k8srequiresecrets
-spec:
-  crd:
-    spec:
-      names:
-        kind: K8sRequireSecrets
-  targets:
-    - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8srequiresecrets
-
-        sensitive_keywords := ["password", "secret", "key", "token"]
-
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.containers[_]
-          env := container.env[_]
-          env.value
-          lower(env.name) == keyword
-          keyword := sensitive_keywords[_]
-          msg := sprintf("Container %v has hardcoded sensitive env var %v. Use Kubernetes Secrets.", [container.name, env.name])
-        }
-
-        

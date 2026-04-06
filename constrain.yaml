@@ -31,16 +31,3 @@ spec:
         kinds: ["Pod"]
       - apiGroups: ["apps"]
         kinds: ["Deployment"]
----
-apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sRequireSecrets
-metadata:
-  name: enforce-secrets
-spec:
-  match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
-      - apiGroups: ["apps"]
-        kinds: ["Deployment"]
- 
