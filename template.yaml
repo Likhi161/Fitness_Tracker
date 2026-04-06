@@ -83,4 +83,3 @@ spec:
           input.review.object.spec.strategy.type != "RollingUpdate"
           msg := "Only RollingUpdate strategy is allowed"
         }
-      
