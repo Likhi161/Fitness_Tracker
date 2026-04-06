@@ -33,15 +33,15 @@ spec:
                 - devops
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - fitness-tracker-app
-            topologyKey: "kubernetes.io/hostname"   
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - fitness-tracker-app
+                topologyKey: "kubernetes.io/hostname"   
       tolerations:
       - key: "env"
         operator: "Equal"
