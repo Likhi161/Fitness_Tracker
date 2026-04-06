@@ -71,15 +71,18 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8srollingupdate
- 
+
+        
         violation[{"msg": msg}] {
           input.review.object.kind == "Deployment"
-          not input.review.object.spec.strategy.type
-          msg := "Deployment must define a strategy"
+          not input.review.object.spec.strategy
+          msg := sprintf("Deployment %v must explicitly define strategy as RollingUpdate", [input.review.object.metadata.name])
         }
- 
+
+        
         violation[{"msg": msg}] {
           input.review.object.kind == "Deployment"
-          input.review.object.spec.strategy.type != "RollingUpdate"
-          msg := "Only RollingUpdate strategy is allowed"
+          strategy := input.review.object.spec.strategy
+          strategy.type != "RollingUpdate"
+          msg := sprintf("Deployment %v must use RollingUpdate strategy", [input.review.object.metadata.name])
         }
