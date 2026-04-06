@@ -36,11 +36,11 @@ spec:
           - weight: 1
             podAffinityTerm:
               labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - fitness-tracker-app
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - fitness-tracker-app
             topologyKey: "kubernetes.io/hostname"   
       tolerations:
       - key: "env"
