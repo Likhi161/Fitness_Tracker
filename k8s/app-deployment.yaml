@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-tracker-app
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  selector:
+    matchLabels:
+      app: fitness-tracker-app
+  template:
+    metadata:
+      labels:
+        app: fitness-tracker-app
+      annotations:
+        ad.datadoghq.com/fitness-tracker-app.logs: >-
+          [{"source":"nodejs","service":"fitness-tracker-service"},
+           {"source":"nodejs","service":"fitness-tracker-app"}]
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: training
+                operator: In
+                values:
+                - devops
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - fitness-tracker-app
+                topologyKey: "kubernetes.io/hostname"   
+      tolerations:
+      - key: "env"
+        operator: "Equal"
+        value: "prod"
+        effect: "NoSchedule"        
+      containers:
+      - name: fitness-tracker-app
+        image: pulkit197/fitness_tracker-master-copy3-fitness-app:latest
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+        envFrom:
+        - configMapRef:
+            name: fitness-configmap
+        env:
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+      volumes:
+      - name: likhitha-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fitness-tracker-service
+spec:
+  selector:
+    app: fitness-tracker-app
+  ports:
+  - port: 80
+    targetPort: 5000
+  type: LoadBalancer
