@@ -3,3 +3,4 @@ kind: StorageClass
 metadata:
   name: mongodb-storage
 provisioner: cluster.local/nfs-subdir-external-provisioner
+allowVolumeExpansion: true
