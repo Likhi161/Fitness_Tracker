@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/Likhi161/Fitness_Tracker.git
-    targetRevision: master
+    targetRevision: HEAD
     path: k8s
   destination:
     server: https://kubernetes.default.svc
